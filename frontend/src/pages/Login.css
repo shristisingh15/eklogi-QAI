@@ -1,0 +1,130 @@
+/* Full page layout with AI background */
+.login-page {
+  display: flex;
+  align-items: center;   /* vertical centering */
+  height: 100vh;
+
+  /* 👇 AI background image */
+  background: url("../assets/bg.png.jpeg") no-repeat center center;
+  background-size: cover;
+
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  padding-left: 60px; /* push card from edge (optional spacing) */
+}
+
+/* Left: login card */
+.login-left {
+  display: flex;
+  justify-content: flex-start;  /* align card to the left */
+  align-items: center;
+  width: 100%;
+  max-width: 450px;             /* control card container width */
+}
+
+.login-left .login-card {
+  background-color: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Form */
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+}
+
+/* Inputs */
+.login-card input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* === Unified Button Base === */
+.login-card button[type="submit"],
+.gmail-login,
+.signin-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.25s ease-in-out, transform 0.15s ease-in-out;
+  margin-top: 12px;
+}
+
+/* Hover effect */
+.login-card button[type="submit"]:hover,
+.gmail-login:hover,
+.signin-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Login button */
+.login-card button[type="submit"] {
+  background: linear-gradient(to right, #7b9df0, #9a7dd6);
+  color: white;
+}
+.login-card button[type="submit"]:hover {
+  background: linear-gradient(to right, #6a8be2, #8668c4);
+}
+
+/* Gmail button */
+.gmail-login {
+  background: hsl(211, 37%, 48%);
+  color: white;
+}
+.gmail-login:hover {
+  background: #d65b4f;
+}
+
+/* Sign In button */
+.signin-btn {
+  background: #64a8e8;
+  color: white;
+}
+.signin-btn:hover {
+  background: #4f90d1;
+}
+
+/* Messages */
+.error {
+  color: red;
+  font-size: 0.9rem;
+}
+.success {
+  color: green;
+  font-size: 0.9rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .login-page {
+    justify-content: center;  /* center on small screens */
+    padding-left: 0;
+  }
+
+  .login-left {
+    max-width: 100%;
+    padding: 20px;
+    justify-content: center;
+  }
+
+  .login-left .login-card {
+    max-width: 90%;
+    padding: 30px;
+  }
+}

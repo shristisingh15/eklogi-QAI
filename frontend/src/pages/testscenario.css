@@ -1,0 +1,172 @@
+/* testscenarios.css
+   Clean tile/grid view for Test Scenarios
+   Scoped with .test-scenarios-root in the component markup
+*/
+
+/* Root specifics */
+.test-scenarios-root {
+  padding: 12px 24px 80px;
+  box-sizing: border-box;
+  background: #f8fafc;
+  min-height: 100vh;
+  color: #0f172a;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Header / meta */
+.test-scenarios-root .project-header h2 { margin: 0 0 6px; font-size: 24px; color: #0f172a; }
+.test-scenarios-root .project-header .muted { margin: 6px 0 12px; color: #6b7280; }
+
+.test-scenarios-root .project-meta { margin-top: 6px; }
+.test-scenarios-root .project-name { font-size: 16px; font-weight: 700; color: #0f172a; margin: 6px 0 4px; }
+.test-scenarios-root .project-desc { color: #6b7280; margin: 0 0 12px; }
+
+/* Controls */
+.test-scenarios-root .controls-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.scenario-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+}
+.scenario-btn:hover { transform: translateY(-2px); }
+.scenario-btn.primary { background:#2563eb; color:#fff; border-color:#1e40af; }
+.scenario-btn.positive { background:#16a34a; color:#fff; border-color:#15803d; }
+
+.test-scenarios-root .controls-right { margin-left: auto; display:flex; gap:8px; align-items:center; }
+.selected-counter { color: #6b7280; font-size: 14px; min-width: 110px; text-align: right; }
+
+/* Tiles container */
+.tiles-wrap { margin-top: 8px; }
+.empty-state { background: #fff; padding: 24px; border-radius: 10px; color: #6b7280; }
+
+/* Grid */
+.tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+
+/* Card */
+.tile-card {
+  background: #fff;
+  border: 1px solid #eef2f6;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* header */
+.tile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tile-select { display:flex; align-items:center; }
+.tile-title { margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; flex: 1; }
+.tile-priority { color: #6b7280; font-size: 13px; padding: 4px 8px; border-radius: 12px; background: #f8fafc; }
+
+/* description */
+.tile-desc { color: #374151; font-size: 14px; margin: 0; }
+
+/* steps list */
+.tile-steps { margin: 8px 0 0; padding-left: 18px; color: #374151; font-size: 14px; }
+.tile-steps li { margin-bottom: 6px; }
+
+/* expected */
+.tile-expected { font-size: 13px; color: #0f172a; margin-top: 6px; }
+
+/* footer */
+.tile-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tile-actions { display:flex; gap:8px; }
+.btn { appearance: none; border: 1px solid #d1d5db; background: #fff; color: #0f172a; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.btn-edit { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+.btn-delete { background: #fff5f5; border-color: #fecaca; color: #b91c1c; }
+.tile-meta { margin-left: auto; color: #9aa4ad; font-size: 12px; }
+
+/* section headers for partition */
+.tiles-section {
+  margin-top: 24px;
+}
+.tiles-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 12px;
+  cursor: default;
+}
+
+/* Expandable header */
+.tiles-section-title.expandable {
+  cursor: pointer;
+  color: #2563eb;
+  display: inline-block;
+}
+.tiles-section-title.expandable:hover {
+  text-decoration: underline;
+}
+
+/* small screens */
+@media (max-width: 640px) {
+  .tiles-grid { grid-template-columns: 1fr; }
+  .test-scenarios-root .controls-right { width: 100%; justify-content: space-between; margin-top: 8px; }
+}
+/* Disabled buttons */
+.disabled-btn {
+  background-color: #e5e7eb; /* light grey */
+  color: #9ca3af;           /* muted text */
+  cursor: not-allowed;
+  border: 1px solid #d1d5db;
+  opacity: 0.6;
+}
+
+.disabled-btn:hover {
+  background-color: #e5e7eb; /* no hover effect */
+  color: #9ca3af;
+}
+/* Grouping by business process */
+.tiles-section-title.expandable {
+  cursor: pointer;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tiles-section-title.expandable:hover {
+  text-decoration: underline;
+}
+/* Highlighted state */
+.btn-generating {
+  background-color: #ff9800 !important; /* orange highlight */
+  border-color: #e68900 !important;
+  color: #fff !important;
+  box-shadow: 0 0 12px rgba(255, 152, 0, 0.6);
+}
+
+/* Spinner animation */
+.spin-icon {
+  animation: spin 1s linear infinite;
+  font-size: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

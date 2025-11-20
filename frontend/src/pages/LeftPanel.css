@@ -1,0 +1,260 @@
+/* Sidebar Container */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 18px 14px;
+  font-family: "Inter", sans-serif;
+}
+
+/* LOGO area */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0 12px 0;
+  cursor: pointer;
+}
+.sidebar-logo img {
+  width: 140px;           /* adjust as needed */
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 6px;     /* optional */
+}
+
+/* Navigation Section */
+.sidebar-nav {
+  margin-top: 6px;
+  flex-grow: 0;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li {
+  font-size: 15px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.06s ease;
+}
+
+/* left-aligned content so chevron can sit right */
+.nav-left {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* hover / active for nav items */
+.sidebar-nav li:hover {
+  background: linear-gradient(90deg, #f0f9ff, #e0f2fe);
+  color: #0284c7;
+  transform: translateX(3px);
+}
+
+.sidebar-nav li.active {
+  background: #e0f2fe;
+  color: #0284c7;
+  font-weight: 600;
+}
+
+/* Projects toggle row (below Settings) */
+.projects-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  margin-top: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #374151;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.projects-toggle-row:hover {
+  background: #f9fafb;
+  color: #2563eb;
+}
+
+.projects-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.projects-chev {
+  font-size: 11px;
+  transform: rotate(0deg);
+  transition: transform 0.18s ease, color 0.18s ease;
+  color: #6b7280;
+}
+
+.projects-chev.open {
+  transform: rotate(90deg);
+  color: #2563eb;
+}
+
+/* Projects List container */
+.sidebar-projects {
+  margin-top: 6px;
+  padding: 6px 0 0 0;
+  border-top: 1px solid #eef2f6;
+}
+
+/* Project List (items) */
+.project-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+/* each project row holds the name button and small caret */
+.project-row {
+  display: block;
+  padding: 6px 8px;
+  border-radius: 8px;
+  position: relative;
+}
+
+/* project name: full-width button (left) */
+.project-name {
+  display: inline-block;
+  width: calc(100% - 36px); /* leaves room for caret */
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 6px 6px 6px 8px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.project-name:hover {
+  background: rgba(59,130,246,0.05);
+  color: #2563eb;
+}
+
+/* active project highlight */
+.project-name.active {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* small expand button for project files (right side) */
+.project-expand {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-left: 6px;
+}
+
+.project-expand.open {
+  transform: rotate(90deg);
+  color: #374151;
+}
+
+/* file list inside a project */
+.file-list {
+  list-style: none;
+  padding-left: 12px;
+  margin: 6px 0 0 0;
+}
+
+.file-item {
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.file-item:hover {
+  background: rgba(99,102,241,0.06);
+  color: #4f46e5;
+}
+
+.file-version {
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+/* Footer Logout (pinned to bottom) */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 10px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.1s ease;
+}
+
+.logout-btn:hover {
+  background: #ef4444;
+  color: #fff;
+  transform: translateY(-1px);
+}
+/* Wrap the logo + text vertically */
+.logo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* QAI text styling */
+.logo-text {
+  margin-top: 8px;
+  font-weight: 800;       /* bolder */
+  font-size: 22px;        /* bigger */
+  color: #111827;         /* dark gray / near-black */
+  letter-spacing: 1px;    /* optional for style */
+  text-transform: uppercase; /* makes it stand out */
+}
+
+
+/* Disabled nav items (greyed out) */
+.sidebar-nav li.disabled {
+  color: #9ca3af; /* grey */
+  pointer-events: none; /* makes unclickable */
+  opacity: 0.6;
+  cursor: default;
+}

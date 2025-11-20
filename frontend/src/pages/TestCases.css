@@ -1,0 +1,70 @@
+/* TestPage.css — scoped so it doesn't clash with your main ProjectFlow.css */
+
+.testpage-root {
+  padding: 18px;
+  background: #f7fafc;
+}
+
+.testpage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.selected-scenario-card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 2px 8px rgba(2,6,23,0.03);
+}
+
+.selected-head {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.steps-list {
+  margin-top: 12px;
+  padding-left: 18px;
+}
+.test-options {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.test-options .dropdown {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.expected {
+  margin-top: 8px;
+  color: #111827;
+  /* Buttons and modal small helpers for TestPage */
+.selected-scenario-card .btn { margin-left: 6px; }
+.bp-card .btn { margin-left: 6px; }
+
+/* Edit / Delete button colors already exist in your ProjectFlow.css (.btn-edit, .btn-delete).
+   Ensure they are present. If not, add fallback styles here: */
+.btn-edit { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+.btn-delete { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+
+/* Modal inputs (reuse your form-input/form-textarea styles if present) */
+.modal .form-label { margin-top: 10px; display:block; }
+.modal .form-input, .modal .form-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.modal .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top: 8px; }
+
+}
