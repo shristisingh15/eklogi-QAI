@@ -102,7 +102,7 @@ const LeftPanel: React.FC = () => {
       <div className="sidebar-logo" onClick={() => navigate("/dashboard")} role="button" aria-label="Go to dashboard">
         <div className="logo-wrapper">
           <img src={logoSrc} alt="Exacoda logo" />
-          <div className="logo-text">QAI</div>
+          <div className="logo-text">Agentic Software Testing Demo</div>
         </div>
       </div>
 
