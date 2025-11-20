@@ -18,7 +18,7 @@ export default function LoginPage() {
     setAuthState("idle");
 
     setTimeout(() => {
-      if (email === "admin@exacoda.com" && password === "12345") {
+      if (email === "admin@eklogi.com" && password === "admin123") {
         setAuthState("success");
         navigate("/dashboard"); // 👈 redirect after login
       } else {

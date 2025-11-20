@@ -13,7 +13,7 @@ type GeneratedCode = {
 };
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE || "https://exacoda-qai-q8up.onrender.com";
+  import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 export default function TestRunPage(): JSX.Element {
   const location = useLocation() as any;

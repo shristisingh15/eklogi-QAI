@@ -8,7 +8,7 @@ import { FaSpinner } from "react-icons/fa";
 
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE || "https://exacoda-qai-q8up.onrender.com";
+  import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 type ProjectDetails = {
   _id?: string;

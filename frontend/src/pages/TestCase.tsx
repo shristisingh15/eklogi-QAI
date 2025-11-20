@@ -27,7 +27,7 @@ type GeneratedCode = {
 };
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE || "https://exacoda-qai-q8up.onrender.com";
+  import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 const FRAMEWORK_OPTIONS = ["JUnit", "Selenium", "Mocha", "Jest", "PyTest"];
 const LANGUAGE_OPTIONS = ["Java", "TypeScript", "JavaScript", "Python", "C#"];

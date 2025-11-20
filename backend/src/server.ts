@@ -21,7 +21,7 @@ const FRONTEND_ORIGINS = (process.env.FRONTEND_ORIGINS || "")
   .map((s) => s.trim())
   .filter(Boolean);
 const defaultOrigins = ["http://localhost:5173", "http://localhost:5174"];
-const allowedOrigins = Array.from(new Set([...defaultOrigins, ...FRONTEND_ORIGINS, "https://exacodaqai-xdtb.onrender.com"]));
+const allowedOrigins = Array.from(new Set([...defaultOrigins, ...FRONTEND_ORIGINS, "https://eklogi-qai-v3wn.onrender.com"]));
 
 // Main CORS middleware
 app.use(

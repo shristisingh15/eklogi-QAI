@@ -15,5 +15,6 @@
     "skipLibCheck": true,
     "noEmitOnError": false
   },
-  "include": ["src", "src/types"]
+  "include": ["src"],
+  "exclude": ["../frontend", "../frontend/**", "node_modules"]
 }

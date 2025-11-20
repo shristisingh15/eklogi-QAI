@@ -4,7 +4,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import "./ProjectFlow.css";
 import StepButtons from "./StepButton";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "https://exacoda-qai-q8up.onrender.com";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 type BP = {
   _id: string;
