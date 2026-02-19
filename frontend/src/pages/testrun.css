@@ -1,0 +1,417 @@
+/* TestRun.css (updated) */
+
+/* -------------------
+   Page / Topbar
+   ------------------- */
+.project-main.testpage-root,
+.project-page.test-scenarios-root {
+  padding: 24px 32px;
+  background: #f6fbfd;
+  color: #0f172a;
+  min-height: 100vh;
+  box-sizing: border-box;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Topbar shared with other pages */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  margin-bottom: 8px;
+}
+
+.topbar a {
+  color: #2b6cb0;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* small topbar buttons */
+.topbar .topbar-actions button {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.topbar .topbar-actions button:hover { opacity: 0.95; }
+
+/* -------------------
+   Header / Project
+   ------------------- */
+.testpage-header,
+.project-header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  margin-bottom: 12px;
+}
+
+.testpage-header h2,
+.project-header h2 {
+  margin: 6px 0 4px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.project-desc,
+.testpage-header .muted,
+.project-header .muted {
+  color: #6b7280;
+  margin: 0;
+}
+
+/* center the StepButtons block */
+.project-header .stepper-center,
+.testpage-header .stepper-center {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+/* -------------------
+   Stepper / Flow buttons (StepButtons)
+   ------------------- */
+.stepper-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.stepper-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.step-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #e6eefc;
+  background: #fff;
+  color: #0f172a;
+  padding: 0;
+  box-shadow: 0 6px 18px rgba(11, 116, 255, 0.0);
+  transition: all 180ms ease;
+}
+
+.step-circle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(11,116,255,0.06);
+}
+
+/* completed = green */
+.step-circle.completed {
+  background: #16a34a;
+  color: #fff;
+  border: 1px solid rgba(22,163,74,0.12);
+}
+
+/* active = blue */
+.step-circle.active {
+  background: #0b74ff;
+  color: #fff;
+  border: 1px solid rgba(11,116,255,0.16);
+  box-shadow: 0 8px 26px rgba(11,116,255,0.12);
+}
+
+/* labels */
+.step-label {
+  font-size: 13px;
+  color: #374151;
+  white-space: nowrap;
+  display: inline-block;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+.step-label.active-label {
+  color: #0b74ff;
+  font-weight: 700;
+}
+
+/* step arrow between steps */
+.step-arrow {
+  font-size: 14px;
+  color: rgba(15, 23, 42, 0.18);
+  margin-left: 8px;
+  margin-right: 8px;
+  transform: translateY(-2px);
+}
+.step-arrow.filled {
+  color: rgba(11,116,255,0.18);
+}
+
+/* -------------------
+   Divider
+   ------------------- */
+.section-divider {
+  border: 0;
+  height: 1px;
+  background: rgba(15, 23, 42, 0.08);
+  margin: 18px 0;
+}
+
+/* -------------------
+   Controls row (framework/lang/select/next)
+   ------------------- */
+.controls-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.scenario-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid rgba(15,23,42,0.06);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* disabled look */
+.disabled-btn {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* selects bigger and cleaner */
+.controls-row select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(15,23,42,0.06);
+  background: #fff;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  outline: none;
+  min-width: 140px;
+}
+
+/* checkbox label gap */
+.controls-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* primary button */
+.btn {
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid rgba(15,23,42,0.06);
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover { opacity: 0.95; }
+
+.btn-primary {
+  background: linear-gradient(180deg, #0b74ff 0%, #0468e6 100%);
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  box-shadow: 0 8px 20px rgba(11,116,255,0.12);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* selected counter */
+.controls-row .selected-counter,
+.controls-row > div[style*="color: #666"] {
+  font-size: 13px;
+  color: #666;
+}
+
+/* -------------------
+   Tiles / Test Case cards (reuse existing look)
+   ------------------- */
+.tiles-section {
+  margin-top: 18px;
+}
+
+.tiles-section-title {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tiles-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.tile-card {
+  background: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(15,23,42,0.04);
+  box-shadow: 0 6px 16px rgba(14,28,42,0.02);
+}
+
+.tile-title {
+  font-size: 15px;
+  margin: 0 0 6px 0;
+}
+
+/* steps in tile */
+.tile-steps {
+  margin: 6px 0 0 18px;
+}
+
+/* expected result box */
+.tile-expected {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+/* -------------------
+   Test Run specific layout: code + summary column
+   ------------------- */
+.testrun-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 28px;
+  margin-top: 18px;
+}
+
+@media (max-width: 980px) {
+  .testrun-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .project-main.testpage-root,
+  .project-page.test-scenarios-root {
+    padding: 18px;
+  }
+}
+
+/* code card */
+.code-card {
+  background: #fff;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(14, 28, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+.code-block {
+  margin-bottom: 20px;
+}
+
+.code-block h4 {
+  font-size: 16px;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+}
+
+.code-card pre {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 14px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  border: 1px solid rgba(2, 6, 23, 0.04);
+}
+
+/* Summary column */
+.summary-card {
+  position: sticky;
+  top: 20px;
+  align-self: start;
+}
+
+.summary-list {
+  background: #fff;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  box-shadow: 0 6px 16px rgba(14, 28, 42, 0.02);
+}
+
+/* run actions inside summary */
+.run-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-run {
+  min-width: 120px;
+}
+
+/* small text util */
+.small-muted {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* small helpers */
+.kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+/* ensure buttons inside cards look consistent */
+.code-card .btn,
+.summary-card .btn {
+  border-radius: 8px;
+}
+
+/* ensure selectable area for checkbox looks consistent */
+.tile-card input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* tiny responsive tweaks */
+@media (max-width: 540px) {
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .controls-row > div[style*="margin-left: auto"] {
+    margin-left: 0 !important;
+    justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .step-label { display: none; } /* keep stepper compact on tiny screens */
+}

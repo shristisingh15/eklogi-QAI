@@ -1,0 +1,128 @@
+/* frontend/src/pages/UploadDocument.css */
+
+.upload-container {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  max-width: none;
+  margin: 60px auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+.upload-container h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+.upload-container input[type="file"] {
+  display: block;
+  margin: 20px auto;
+  font-size: 14px;
+}
+
+.upload-btn {
+  display: inline-block;
+  background-color: #0b74ff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.upload-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.upload-btn:hover:not(:disabled) {
+  background-color: #095fcc;
+}
+
+/* Popup overlay */
+.popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  font-size: 16px;
+  color: #333;
+}
+
+/* ===========================
+   Hardcoded Upload Table
+   =========================== */
+.upload-table {
+  width: 100%;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 14px;
+}
+
+.upload-table th,
+.upload-table td {
+  border: 1px solid #d1d5db; /* light gray border */
+  padding: 10px 12px;
+}
+
+.upload-table th {
+  background-color: #f3f4f6;
+  text-align: center;
+  font-weight: 600;
+  color: #111827; /* darker header text */
+}
+
+.upload-table td {
+  text-align: center;
+  color: #374151;
+}
+
+.upload-table td:first-child {
+  text-align: left; /* left-align document names */
+  font-weight: 500;
+}
+
+.upload-file-btn {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.upload-file-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.upload-file-btn-delete {
+  border-color: #ef4444;
+  background: #fee2e2;
+  color: #b91c1c;
+}

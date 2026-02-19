@@ -1,0 +1,154 @@
+.project-overview-page {
+  padding: 18px 20px;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.project-overview-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.project-overview-back {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.project-overview-upload-btn {
+  border: 1px solid #c7d2fe;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.project-overview-upload-btn:hover {
+  background: #1d4ed8;
+}
+
+.project-overview-upload-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: 2px 0 14px;
+}
+
+.project-overview-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.project-overview-card h2 {
+  margin: 0 0 12px;
+  font-size: 30px;
+  color: #0f172a;
+}
+
+.project-overview-card h3 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #1e293b;
+}
+
+.project-overview-card p {
+  margin: 0;
+  color: #64748b;
+}
+
+.project-overview-error {
+  color: #b42318;
+}
+
+.project-overview-metrics-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.project-overview-metrics-head h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  color: #0f172a;
+}
+
+.project-overview-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.project-overview-metric-item {
+  border: 1px solid #e9edf3;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+}
+
+.project-overview-metric-label {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.project-overview-metric-value {
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 700;
+  color: #111827;
+}
+
+.project-overview-files-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.project-overview-files-card h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  color: #0f172a;
+}
+
+.project-overview-files-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.project-overview-files-table th,
+.project-overview-files-table td {
+  border: 1px solid #e2e8f0;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #334155;
+  text-align: left;
+  vertical-align: top;
+}
+
+.project-overview-files-table th {
+  background: #f8fafc;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+@media (max-width: 1100px) {
+  .project-overview-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .project-overview-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
