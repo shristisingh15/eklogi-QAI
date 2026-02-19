@@ -17,11 +17,20 @@ dashboardRouter.get("/projects", async (req, res, next) => {
 /** GET /dashboard/overview */
 dashboardRouter.get("/overview", async (_req, res, next) => {
   try {
-    const [totalProjects, totalDocuments, totalBusinessProcesses] = await Promise.all([
+    const [totalProjects, totalDocuments, totalBusinessProcessesAgg] = await Promise.all([
       Project.countDocuments({}),
       ProjectFile.countDocuments({}),
-      BusinessProcess.countDocuments({}),
+      ProjectFile.aggregate([
+        {
+          $group: {
+            _id: null,
+            total: { $sum: { $ifNull: ["$processCount", 0] } },
+          },
+        },
+      ]),
     ]);
+
+    const totalBusinessProcesses = Number(totalBusinessProcessesAgg?.[0]?.total || 0);
 
     res.json({
       totalProjects,

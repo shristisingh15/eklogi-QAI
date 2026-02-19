@@ -24,6 +24,7 @@ const TestCaseSchema = new mongoose.Schema({
   regulatorySensitivity: { type: String, default: "" },
   edited: { type: Boolean, default: false, index: true },
   testRunSuccess: { type: Boolean, default: false, index: true },
+  codeGenerated: { type: Boolean, default: false, index: true },
   type: {
     type: String,
     enum: ["Unit", "Integration", "System", "Other", "Positive", "Negative", "Edge", "Security", "Performance", "Usability"],

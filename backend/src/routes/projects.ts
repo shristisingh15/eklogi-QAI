@@ -474,15 +474,18 @@ projectsRouter.get("/:id/overview", async (req, res, next) => {
       : projectId;
 
     const bpFilter = objId
-      ? { projectId: { $in: [projectId, objId] }, matched: true }
-      : { projectId, matched: true };
+      ? { projectId: { $in: [projectId, objId] } }
+      : { projectId };
 
     const [businessProcessCount, scenarioCount, testCaseCount, testCodeCount, filesRaw] =
       await Promise.all([
         BusinessProcess.countDocuments(bpFilter),
         Scenario.countDocuments({ projectId: projectIdFilter }),
         TestCase.countDocuments({ projectId: projectIdFilter }),
-        TestCase.countDocuments({ projectId: projectIdFilter, testRunSuccess: true }),
+        TestCase.countDocuments({
+          projectId: projectIdFilter,
+          $or: [{ codeGenerated: true }, { testRunSuccess: true }],
+        }),
         ProjectFile.find({ projectId: projectIdFilter }).sort({ uploadedAt: -1 }).lean(),
       ]);
 
@@ -1181,12 +1184,12 @@ Return the generated test code only. Do NOT include commentary.
       // Only successful generated test cases should turn green and clear edited state.
       await TestCase.updateMany(
         { projectId, _id: { $in: selectedTestCaseIds } },
-        { $set: { testRunSuccess: false } }
+        { $set: { testRunSuccess: false, codeGenerated: false } }
       );
       if (successfulTestCaseIds.length > 0) {
         await TestCase.updateMany(
           { projectId, _id: { $in: successfulTestCaseIds } },
-          { $set: { edited: false, testRunSuccess: true } }
+          { $set: { edited: false, testRunSuccess: true, codeGenerated: true } }
         );
       }
 

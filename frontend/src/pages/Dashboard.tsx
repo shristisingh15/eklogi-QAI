@@ -91,7 +91,6 @@ const Dashboard: React.FC = () => {
         <div className="overview-panel">
           <div className="overview-head">
             <h3>Overview</h3>
-            <button type="button" className="overview-range-btn">Last 30 days</button>
           </div>
           <div className="overview-grid">
             <div className="overview-card">
