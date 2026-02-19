@@ -5,7 +5,7 @@ import { auth } from "../auth";
 import "./Dashboard.css";
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE || "http://localhost:5004" ;//"http://localhost:5004" ;
+  import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com" ;//"https://eklogi-qai.onrender.com" ;
 
 type OverviewStats = {
   totalProjects: number;

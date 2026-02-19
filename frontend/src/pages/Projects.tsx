@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5004";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 interface Project {
   _id?: string;

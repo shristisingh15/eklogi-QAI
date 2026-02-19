@@ -18,7 +18,7 @@ const StepButtons: React.FC = () => {
   const [hasEditedScenario, setHasEditedScenario] = React.useState(false);
   const [hasEditedTestCase, setHasEditedTestCase] = React.useState(false);
 
-  const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:5004";
+  const API_BASE = (import.meta as any).env?.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
   const pathParts = location.pathname.split("/").filter(Boolean);
   const currentStepPath = pathParts[2] || "upload";

@@ -5,7 +5,7 @@ import "./ProjectFlow.css";
 import StepButtons from "./StepButton";
 import SourceFileInfo from "./SourceFileInfo";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5004";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 type BP = {
   _id: string;

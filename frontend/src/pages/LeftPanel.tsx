@@ -5,7 +5,7 @@ import { auth } from "../auth";
 import "./LeftPanel.css";
 import logoSrc from "../assets/logoo.png.jpeg"; // adjust path/name
 
-const API_BASE = (import.meta.env.VITE_API_BASE || "http://localhost:5004")
+const API_BASE = (import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com")
   .split(",")[0]
   .trim()
   .replace(/\/+$/, "");

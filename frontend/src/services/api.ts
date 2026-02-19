@@ -1,4 +1,4 @@
-const API_BASE = `${import.meta.env.VITE_API_BASE || "http://localhost:5004"}/api/business`;
+const API_BASE = `${import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com"}/api/business`;
 
 export async function getBusinessProcesses() {
   const res = await fetch(API_BASE);

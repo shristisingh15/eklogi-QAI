@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./ProjectOverview.css";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5004";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 type ProjectData = {
   _id?: string;

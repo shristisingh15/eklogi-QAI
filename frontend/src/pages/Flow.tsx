@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import UploadDocument from "./UploadDocument"; // note singular filename
 
-const API_BASE = (import.meta.env.VITE_API_BASE as string) || "http://localhost:5004";
+const API_BASE = (import.meta.env.VITE_API_BASE as string) || "https://eklogi-qai.onrender.com";
 
 type ProjectDetails = {
   _id?: string;

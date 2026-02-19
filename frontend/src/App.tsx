@@ -19,8 +19,8 @@ import TestScenarios from "./pages/TestScenario";
 import TestCases from "./pages/TestCase";
 import TestRun from "./pages/TestRun";
 
-// Pull API base from .env (VITE_API_BASE=http://localhost:5004)
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5004";
+// Pull API base from .env (VITE_API_BASE=https://eklogi-qai.onrender.com)
+const API_BASE = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 /** Demo page: lists business processes from Mongo */
 function BusinessList() {

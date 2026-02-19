@@ -9,7 +9,7 @@ import { FaSpinner } from "react-icons/fa";
 
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE || "http://localhost:5004";
+  import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 type ProjectDetails = {
   _id?: string;

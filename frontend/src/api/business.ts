@@ -1,5 +1,5 @@
 // frontend/src/api/business.ts
-const API = import.meta.env.VITE_API_BASE || "http://localhost:5004";
+const API = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 export async function fetchBusinessTiles(opts?: { type?: "all" | "business" | "loan"; q?: string; limit?: number }) {
   const params = new URLSearchParams();

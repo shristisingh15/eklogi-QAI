@@ -17,7 +17,7 @@ type GeneratedCode = {
 };
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE || "http://localhost:5004";
+  import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 export default function TestRunPage(): JSX.Element {
   const location = useLocation() as any;

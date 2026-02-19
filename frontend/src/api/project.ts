@@ -1,4 +1,4 @@
-const API = import.meta.env.VITE_API_BASE || "http://localhost:5004";
+const API = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
 export type Project = { _id: string; name: string; description?: string; type?: string; createdAt?: string };
 export type ProjectList = { items: Project[]; total: number };

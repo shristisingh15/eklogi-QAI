@@ -6,7 +6,7 @@ import StepButtons from "./StepButton"; // ⬅️ shared stepper buttons
 import SourceFileInfo from "./SourceFileInfo";
 
 // Use your API base (already set in your file). Keep as-is.
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5004";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 const MAX_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED = [
   "application/pdf",
