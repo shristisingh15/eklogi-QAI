@@ -9,8 +9,30 @@ export const dashboardRouter = Router();
 dashboardRouter.get("/projects", async (req, res, next) => {
   try {
     const limit = Math.max(parseInt(String(req.query.limit || "12"), 10), 1);
-    const items = await Project.find().sort({ createdAt: -1 }).limit(limit).lean();
-    res.json({ items, total: items.length });
+    const q = String(req.query.q || "").trim();
+    const type = String(req.query.type || "").trim();
+
+    const filter: any = {};
+    if (q) {
+      const rx = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      filter.$or = [{ projectName: rx }, { description: rx }];
+    }
+    if (type && type.toLowerCase() !== "all types") {
+      filter.projectType = type;
+    }
+
+    // Project schema has no timestamps, so sorting by _id (indexed) is faster.
+    // Select only fields used by UI to reduce payload.
+    const [items, total] = await Promise.all([
+      Project.find(filter)
+        .sort({ _id: -1 })
+        .select({ projectName: 1, description: 1, projectType: 1, date: 1, progress: 1 })
+        .limit(limit)
+        .lean(),
+      Project.countDocuments(filter),
+    ]);
+
+    res.json({ items, total });
   } catch (e) { next(e); }
 });
 

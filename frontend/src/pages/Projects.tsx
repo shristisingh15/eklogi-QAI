@@ -38,7 +38,8 @@ const Projects: React.FC = () => {
     try {
       const params = new URLSearchParams();
       if (query.trim()) params.set("q", query.trim());
-      params.set("limit", "100");
+      if (filterType !== "All Types") params.set("type", filterType);
+      params.set("limit", "60");
       const res = await fetch(`${API_BASE}/dashboard/projects?${params.toString()}`, {
         signal: ac.signal,
       });
@@ -48,10 +49,9 @@ const Projects: React.FC = () => {
       items = items.map((p: any) => ({
         ...p,
         name: p.name || p.projectName || "Untitled Project",
+        type: p.type || p.projectType || "Web",
+        step: p.step || (typeof p.progress === "number" ? `${p.progress}%` : "0%"),
       }));
-      if (filterType !== "All Types") {
-        items = items.filter((p) => (p.type || "Web") === filterType);
-      }
       setProjects(items);
     } catch (e: any) {
       if (e?.name !== "AbortError") setErr(e.message || "Failed to fetch projects");
@@ -276,4 +276,3 @@ const Projects: React.FC = () => {
 };
 
 export default Projects;
-

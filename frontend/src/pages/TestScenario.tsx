@@ -54,6 +54,19 @@ const [generating, setGenerating] = useState<boolean>(false);
     low: 3,
   };
 
+  const naturalCompare = (a: string, b: string) =>
+    a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+
+  const sortScenariosAsc = (list: any[]) =>
+    [...list].sort((a: any, b: any) => {
+      const aId = String(a?.scenarioId || "").trim();
+      const bId = String(b?.scenarioId || "").trim();
+      if (aId && bId && aId !== bId) return naturalCompare(aId, bId);
+      const aTitle = String(a?.title || "").trim();
+      const bTitle = String(b?.title || "").trim();
+      return naturalCompare(aTitle, bTitle);
+    });
+
 
   // fetch project meta
   useEffect(() => {
@@ -316,7 +329,7 @@ const [generating, setGenerating] = useState<boolean>(false);
   }, [scenarios]);
 
   // 🔹 Group scenarios by business process
-const groupedByBP = useMemo(() => {
+  const groupedByBP = useMemo(() => {
   // map: bpKey -> { name, scenarios: Map<scenarioId, scenario> }
   const bpMap = new Map<string, { name: string; scenarios: Map<string, any> }>();
 
@@ -342,7 +355,7 @@ const groupedByBP = useMemo(() => {
   // convert map -> plain object { bpName: scenarioArray }
   const result: Record<string, any[]> = {};
   for (const [bpKey, { name, scenarios: scenMap }] of bpMap.entries()) {
-    result[name] = Array.from(scenMap.values());
+    result[name] = sortScenariosAsc(Array.from(scenMap.values()));
   }
   return result;
 }, [latestScenarios]);

@@ -50,7 +50,7 @@
 
 .upload-container h2 {
   margin: 0;
-  font-size: 44px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1.15;
   color: #1f2937;
@@ -63,7 +63,7 @@
 
 .upload-copy p {
   margin: 0 0 6px;
-  font-size: 21px;
+  font-size: 14px;
   line-height: 1.3;
   color: #6b7280;
 }
@@ -81,13 +81,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 56px;
-  min-width: 146px;
+  min-height: 44px;
+  min-width: 132px;
   background-color: #1f6feb;
   color: #fff;
   border: none;
   padding: 0 22px;
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 600;
   border-radius: 10px;
   cursor: pointer;
@@ -136,7 +136,7 @@
 .history-section h3 {
   margin: 0 0 10px;
   color: #1f2937;
-  font-size: 34px;
+  font-size: 20px;
   font-weight: 700;
 }
 
@@ -152,7 +152,7 @@
   border-collapse: collapse;
   margin-bottom: 24px;
   font-family: "Inter", Arial, sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   background: #fff;
   border: 1px solid #d1d5db;
   border-radius: 10px;
@@ -162,7 +162,7 @@
 .upload-table th,
 .upload-table td {
   border: 1px solid #d1d5db;
-  padding: 14px 14px;
+  padding: 12px 12px;
 }
 
 .upload-table th {
@@ -241,7 +241,7 @@
 
   .upload-container h2 {
     white-space: normal;
-    font-size: 36px;
+    font-size: 22px;
   }
 
   .upload-btn-wrap {
@@ -260,11 +260,11 @@
   }
 
   .upload-copy p {
-    font-size: 16px;
+    font-size: 13px;
   }
 
   .history-section h3 {
-    font-size: 28px;
+    font-size: 18px;
   }
 
   .upload-table {

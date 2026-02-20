@@ -1555,47 +1555,62 @@ ${promptOverride ? `ADDITIONAL USER INSTRUCTIONS:\n${promptOverride}` : ""}
       }
       parsedTCs = parsedTCs.concat(additional);
     }
-   // Save test cases into Mongo with scenario references
+   // Save test cases into Mongo with scenario references.
+   // IMPORTANT: bind each generated test-case strictly to selected scenarios.
 let inserted: any[] = [];
 try {
-  inserted = await TestCase.insertMany(parsedTCs.map(tc => ({
-    businessProcessId: (() => {
-      const idx = Number(tc?.scenarioIndex ?? -1);
-      const parentScenario = Number.isInteger(idx) && idx >= 0 ? scenarios[idx] : null;
-      return tc.businessProcessId || parentScenario?.businessProcessId || null;
-    })(),
-    businessProcessName: (() => {
-      const idx = Number(tc?.scenarioIndex ?? -1);
-      const parentScenario = Number.isInteger(idx) && idx >= 0 ? scenarios[idx] : null;
-      return tc.businessProcessName || parentScenario?.businessProcessName || "";
-    })(),
-    projectId,
-    scenarioId: (() => {
-      const idx = Number(tc?.scenarioIndex ?? -1);
-      const parentScenario = Number.isInteger(idx) && idx >= 0 ? scenarios[idx] : null;
-      return tc.scenarioId || parentScenario?._id || null;
-    })(),
-    scenarioTitle: (() => {
-      const idx = Number(tc?.scenarioIndex ?? -1);
-      const parentScenario = Number.isInteger(idx) && idx >= 0 ? scenarios[idx] : null;
-      return tc.scenarioTitle || parentScenario?.title || "";
-    })(),
-    title: tc.title,
-    testCaseId: tc.testCaseId || "",
-    description: tc.description || "",
-    persona: tc.persona || "",
-    preRequisites: Array.isArray(tc.preRequisites) ? tc.preRequisites.join("; ") : "",
-    steps: Array.isArray(tc.testSteps) ? tc.testSteps : (Array.isArray(tc.steps) ? tc.steps : []),
-    expected_result: tc.expectedResult || tc.expected_result || "",
-    criticality: tc.criticality || "",
-    blockingType: tc.blocking || "",
-    customerImpact: tc.customerImpact || "",
-    regulatorySensitivity: tc.regulatorySensitivity || "",
-    edited: false,
-    testRunSuccess: false,
-    codeGenerated: false,
-    source: "ai",
-  })));
+  const normalizeId = (v: any) => String(v || "").trim();
+  const scenarioById = new Map<string, any>();
+  for (const s of Array.isArray(scenarios) ? scenarios : []) {
+    const key = normalizeId((s as any)?._id);
+    if (key) scenarioById.set(key, s);
+  }
+
+  const resolveParentScenario = (tc: any) => {
+    const byId = scenarioById.get(normalizeId(tc?.scenarioId));
+    if (byId) return byId;
+    const idx = Number(tc?.scenarioIndex ?? -1);
+    if (Number.isInteger(idx) && idx >= 0 && idx < scenarios.length) {
+      return scenarios[idx];
+    }
+    return null;
+  };
+
+  // Keep only latest generated test-cases for this project.
+  await TestCase.deleteMany({ projectId });
+
+  inserted = await TestCase.insertMany(
+    parsedTCs
+      .map((tc) => {
+        const parentScenario = resolveParentScenario(tc);
+        if (!parentScenario?._id) return null;
+
+        return {
+          businessProcessId: parentScenario?.businessProcessId || tc.businessProcessId || null,
+          businessProcessName: parentScenario?.businessProcessName || tc.businessProcessName || "",
+          projectId,
+          scenarioId: parentScenario?._id,
+          // Always use selected scenario title to avoid AI-created extra scenario buckets.
+          scenarioTitle: parentScenario?.title || "",
+          title: tc.title,
+          testCaseId: tc.testCaseId || "",
+          description: tc.description || "",
+          persona: tc.persona || "",
+          preRequisites: Array.isArray(tc.preRequisites) ? tc.preRequisites.join("; ") : "",
+          steps: Array.isArray(tc.testSteps) ? tc.testSteps : Array.isArray(tc.steps) ? tc.steps : [],
+          expected_result: tc.expectedResult || tc.expected_result || "",
+          criticality: tc.criticality || "",
+          blockingType: tc.blocking || "",
+          customerImpact: tc.customerImpact || "",
+          regulatorySensitivity: tc.regulatorySensitivity || "",
+          edited: false,
+          testRunSuccess: false,
+          codeGenerated: false,
+          source: "ai",
+        };
+      })
+      .filter(Boolean) as any[]
+  );
 } catch (err: any) {
   console.error("❌ Failed to save test cases:", err);
 }

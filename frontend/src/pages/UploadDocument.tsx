@@ -132,7 +132,7 @@ export default function UploadDocument({ setStep, projectId }: UploadDocumentPro
 
         <section className="upload-container">
           <div className="upload-card-grid">
-            <h2>Upload Documents</h2>
+            <h4>Upload Documents</h4>
             <div className="upload-copy">
               <p>Upload your functional requirements, specifications, or user stories</p>
               <p>Drop your files here</p>
