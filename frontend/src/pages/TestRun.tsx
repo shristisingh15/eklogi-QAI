@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useProject } from "./ProjectContext";
 import StepButtons from "./StepButton";
-import SourceFileInfo from "./SourceFileInfo";
 import "./testscenario.css";
+import GenerationStatusPopup, { GenerationStatusData } from "./GenerationStatusPopup";
 
 type GeneratedCode = {
   scenarioId: string | null;
@@ -36,6 +36,7 @@ const state = location.state || {};
   const [expandedScenario, setExpandedScenario] = useState<Record<string, boolean>>({});
   const [expandedCase, setExpandedCase] = useState<Record<string, boolean>>({});
   const [bpSortRank, setBpSortRank] = useState<Record<string, number>>({});
+  const [generationStatus, setGenerationStatus] = useState<GenerationStatusData | null>(null);
 
   const priorityRank: Record<string, number> = {
     critical: 0,
@@ -229,6 +230,18 @@ const hasCodes = codes.length > 0 && codes.some(c => c.code);
   }, [hierarchy, bpSortRank]);
 
   useEffect(() => {
+    const incoming = (location.state as any)?.generationStatus as GenerationStatusData | undefined;
+    if (!incoming) return;
+    setGenerationStatus(incoming);
+    const cleanState = { ...(location.state as any) };
+    delete cleanState.generationStatus;
+    navigate(
+      { pathname: location.pathname, search: location.search, hash: location.hash },
+      { replace: true, state: cleanState }
+    );
+  }, [location, navigate]);
+
+  useEffect(() => {
     const nextBp: Record<string, boolean> = {};
     const nextScenario: Record<string, boolean> = {};
     const nextCase: Record<string, boolean> = {};
@@ -262,33 +275,28 @@ const hasCodes = codes.length > 0 && codes.some(c => c.code);
         </div>
       </div>
 
-      {/* Header */}
-      <div className="project-header" style={{ paddingTop: 12 }}>
-        <h2 style={{ marginTop: 8 }}>
-          {projectCtx?.currentProjectName || (ctxConfig && ctxConfig.projectName) || "Project"}
-        </h2>
-        <p className="muted" style={{ marginTop: 4 }}>
-          {ctxConfig?.description || "Run generated tests"}
-        </p>
+      <div className="page-content-wrap">
+        <div className="project-header stage-project-header">
+          <h2>
+            {projectCtx?.currentProjectName || (ctxConfig && ctxConfig.projectName) || "Project"}
+          </h2>
+          <p className="muted">
+            {ctxConfig?.description || "Run generated tests"}
+          </p>
 
-        <div style={{ marginTop: 14, display: "flex", justifyContent: "center" }}>
-          <StepButtons />
+          <div className="stage-stepper-wrap">
+            <StepButtons />
+          </div>
         </div>
 
-        <SourceFileInfo projectId={projectId} />
-      </div>
-
-         <div style={{ height: "40px" }} />
-
-      <div style={{ padding: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <div style={{ fontSize: 14 }}>
+        <div className="stage-action-row">
+          <div className="stage-action-left" style={{ fontSize: 14 }}>
             <strong>Framework:</strong> {framework} &nbsp; • &nbsp;
             <strong>Language:</strong> {language} &nbsp; • &nbsp;
-            <strong>Selected Cases:</strong> { (testCasesFromState && testCasesFromState.length) || (ctxConfig && ctxConfig.testCases && ctxConfig.testCases.length) || 0 }
+            <strong>Selected Cases:</strong> {(testCasesFromState && testCasesFromState.length) || (ctxConfig && ctxConfig.testCases && ctxConfig.testCases.length) || 0}
           </div>
 
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="stage-action-right">
             <button className="btn" onClick={() => navigate(projectId ? `/project/${projectId}/testcases` : "/dashboard")}>Back</button>
           </div>
         </div>
@@ -298,7 +306,7 @@ const hasCodes = codes.length > 0 && codes.some(c => c.code);
           {noCodes ? (
             <div style={{ padding: 18 }}>
               <p style={{ color: "#666" }}>
-                No generated code found. Please go back to Test Cases and click <strong>Next</strong> to generate.
+                No generated code found. Please go back to Test Cases and click <strong>Approve</strong> to generate.
               </p>
 
               <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
@@ -444,6 +452,7 @@ const hasCodes = codes.length > 0 && codes.some(c => c.code);
         )}
       </div>
 
+      <GenerationStatusPopup data={generationStatus} onClose={() => setGenerationStatus(null)} />
       <div style={{ height: 40 }} />
     </div>
   );

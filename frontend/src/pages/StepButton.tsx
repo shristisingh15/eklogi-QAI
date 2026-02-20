@@ -108,7 +108,7 @@ const StepButtons: React.FC = () => {
               disabled={navDisabled}
               title={
                 navDisabled
-                  ? "Edits pending. Click Next on the current step to regenerate and unlock forward navigation."
+                  ? "Edits pending. Click Approve on the current step to regenerate and unlock forward navigation."
                   : ""
               }
             >

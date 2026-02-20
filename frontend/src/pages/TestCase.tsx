@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useProject } from "./ProjectContext";
 import StepButtons from "./StepButton";
-import SourceFileInfo from "./SourceFileInfo";
 import "./testscenario.css";
+import GenerationStatusPopup, { GenerationStatusData } from "./GenerationStatusPopup";
 
 type TestCase = {
   title?: string;
@@ -92,10 +92,23 @@ export default function TestCasesPage(): JSX.Element {
   const [testCaseDetailsDraft, setTestCaseDetailsDraft] = useState<Record<string, string>>({});
   const [savingTestCaseDetails, setSavingTestCaseDetails] = useState<boolean>(false);
   const [bpSortRank, setBpSortRank] = useState<Record<string, number>>({});
+  const [generationStatus, setGenerationStatus] = useState<GenerationStatusData | null>(null);
 
   useEffect(() => {
     setTestCases(sourceTestCases);
   }, [sourceTestCases]);
+
+  useEffect(() => {
+    const incoming = (location.state as any)?.generationStatus as GenerationStatusData | undefined;
+    if (!incoming) return;
+    setGenerationStatus(incoming);
+    const cleanState = { ...(location.state as any) };
+    delete cleanState.generationStatus;
+    navigate(
+      { pathname: location.pathname, search: location.search, hash: location.hash },
+      { replace: true, state: cleanState }
+    );
+  }, [location, navigate]);
 
   const priorityRank: Record<string, number> = {
     critical: 0,
@@ -385,6 +398,12 @@ export default function TestCasesPage(): JSX.Element {
           testCases: updatedSelectedCases,
           codes: normalized,
           generatedFrom: "selected-test-cases",
+          generationStatus: {
+            title: "Test Codes Generated",
+            count: normalized.filter((c) => !!c.code && !c.error).length,
+            label: "Code Entries",
+            subtitle: `${selectedCases.length} approved test case(s)`,
+          },
         },
       });
     } catch (err: any) {
@@ -510,21 +529,18 @@ export default function TestCasesPage(): JSX.Element {
       </div>
 
       <div className="page-content-wrap">
-        <div className="project-header" style={{ paddingTop: 12 }}>
-          <h2 style={{ marginTop: 8 }}>{projectDisplayName || "Project"}</h2>
-          <p className="muted" style={{ marginTop: 4 }}>
+        <div className="project-header stage-project-header">
+          <h2>{projectDisplayName || "Project"}</h2>
+          <p className="muted">
             {projectSubtitle || "Generated test cases"}
           </p>
-          <div style={{ marginTop: 14, display: "flex", justifyContent: "center" }}>
+          <div className="stage-stepper-wrap">
             <StepButtons />
           </div>
-          <SourceFileInfo projectId={projectId} />
         </div>
 
-        <div style={{ height: 20 }} />
-
-        <div className="controls-row" style={{ alignItems: "center" }}>
-          <div className="controls-left">
+        <div className="stage-action-row">
+          <div className="stage-action-left">
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 13, marginRight: 8 }}>Framework</span>
               <select
@@ -556,34 +572,42 @@ export default function TestCasesPage(): JSX.Element {
             </label>
           </div>
 
-          <div className="controls-right">
+          <div className="stage-action-right">
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
                 type="checkbox"
                 checked={selectAllChecked}
                 onChange={(e) => handleToggleSelectAllCheckbox(e.target.checked)}
               />
-              <span style={{ fontSize: 13 }}>Select all</span>
+              <span style={{ fontSize: 13 }}>Approve all</span>
             </label>
 
             <button className="btn" onClick={handleSelectAllButton} style={{ padding: "8px 12px", borderRadius: 8 }}>
-              {selectedCount === testCases.length && testCases.length > 0 ? "Clear all" : "Select all"}
+              {selectedCount === testCases.length && testCases.length > 0 ? "Clear all" : "Approve all"}
             </button>
 
             <div style={{ minWidth: 140 }}>
               <button
-                className="btn btn-primary"
+                className={`btn btn-primary stage-approve-btn ${generating ? "approve-btn-loading" : ""}`}
                 onClick={handleGenerateAndGo}
                 disabled={!isNextEnabled || generating}
                 style={{
-                  padding: "10px 16px",
-                  borderRadius: 8,
-                  fontSize: 15,
                   cursor: !isNextEnabled || generating ? "not-allowed" : "pointer",
                   opacity: !isNextEnabled || generating ? 0.6 : 1,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
                 }}
               >
-                {generating ? "Generating…" : "Next →"}
+                {generating ? (
+                  <>
+                    <span className="approve-btn-spinner" aria-hidden="true" />
+                    Generating…
+                  </>
+                ) : (
+                  "Approve →"
+                )}
               </button>
             </div>
 
@@ -646,7 +670,7 @@ export default function TestCasesPage(): JSX.Element {
                                       <th>Action</th>
                                       <th>Expected Result</th>
                                       <th>Edit</th>
-                                      <th>Select</th>
+                                      <th>Approve</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -779,6 +803,7 @@ export default function TestCasesPage(): JSX.Element {
           </div>
         )}
 
+        <GenerationStatusPopup data={generationStatus} onClose={() => setGenerationStatus(null)} />
         <div style={{ height: 40 }} />
       </div>
     </div>

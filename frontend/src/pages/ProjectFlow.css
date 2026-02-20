@@ -51,6 +51,71 @@
 }
 .topbar-actions button:hover { background: #0056b3; }
 
+.page-content-wrap {
+  width: 100%;
+  max-width: 1760px;
+  margin: 0 auto;
+}
+
+.stage-project-header {
+  padding-top: 12px;
+  min-height: 86px;
+}
+
+.stage-project-header h2 {
+  margin: 8px 0 0;
+}
+
+.stage-project-header .muted {
+  margin: 4px 0 0;
+}
+
+.stage-stepper-wrap {
+  margin-top: 22px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.stage-action-row {
+  min-height: 62px;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.stage-action-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 260px;
+}
+
+.stage-action-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stage-approve-btn {
+  min-width: 152px;
+  min-height: 42px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 /* Project metadata (name + description) shown under Project ID */
 .project-meta {
   margin-top: 8px;
@@ -612,7 +677,20 @@
   flex-wrap: wrap;
 }
 
+.flow-analysis .stage-action-row {
+  justify-content: flex-end;
+  padding-right: 26px;
+}
+
+.flow-analysis .stage-action-left {
+  display: none;
+}
+
 .flow-analysis .controls-row .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 10px 16px;
   font-size: 15px;
   border-radius: 10px;
@@ -650,6 +728,42 @@
   .flow-analysis .controls-row { gap: 10px; }
 }
 @media (max-width: 600px) {
+  .stage-action-row {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .stage-action-left,
+  .stage-action-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
   .flow-analysis .controls-row { gap: 8px; }
   .flow-analysis .selected-count { display: none; }
+}
+
+.approve-btn-loading {
+  background: #f59e0b !important;
+  border-color: #d97706 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.45) !important;
+}
+
+.approve-btn-loading:hover {
+  background: #f59e0b !important;
+  border-color: #d97706 !important;
+}
+
+.approve-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #ffffff;
+  border-radius: 999px;
+  animation: approve-spin 0.8s linear infinite;
+}
+
+@keyframes approve-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

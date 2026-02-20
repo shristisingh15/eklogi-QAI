@@ -2,13 +2,16 @@
   padding: 18px 20px;
   min-height: 100vh;
   background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .project-overview-topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 0;
 }
 
 .project-overview-back {
@@ -18,7 +21,7 @@
   font-weight: 600;
 }
 
-.project-overview-upload-btn {
+.project-overview-pages-btn {
   border: 1px solid #c7d2fe;
   background: #2563eb;
   color: #fff;
@@ -29,14 +32,51 @@
   cursor: pointer;
 }
 
-.project-overview-upload-btn:hover {
+.project-overview-pages-btn:hover {
   background: #1d4ed8;
 }
 
 .project-overview-upload-row {
   display: flex;
   justify-content: flex-end;
-  margin: 2px 0 14px;
+  margin: 0;
+  padding-right: 2px;
+}
+
+.project-overview-pages-dropdown {
+  position: relative;
+}
+
+.project-overview-pages-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 190px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  padding: 6px;
+  z-index: 50;
+}
+
+.project-overview-pages-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 9px 10px;
+  cursor: pointer;
+}
+
+.project-overview-pages-menu button:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 .project-overview-card {
@@ -72,7 +112,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 16px;
-  margin-bottom: 14px;
+  margin: 0;
 }
 
 .project-overview-metrics-head h3 {

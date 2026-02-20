@@ -1242,45 +1242,71 @@ Return the generated test code only. Do NOT include commentary.
       .join("\n\n---\n\n");
 
     const tcPrompt = `
-You are a senior QA engineer. For each input scenario below, generate a comprehensive set of test cases covering multiple perspectives:
-- Happy path / Positive cases
-- Negative / validation / invalid input cases
-- Edge and boundary cases
-- Security checks (authentication/authorization/inputs) where applicable
-- Performance or concurrency cases (if relevant)
-- Usability or accessibility checks (if relevant)
+You are a senior banking QA specialist.
 
-RETURN ONLY valid JSON — a single flat array of test case objects. Do NOT output any commentary.
-Use only the provided INPUT SCENARIOS block for generation context. Do not use uploaded document context.
+You will receive structured input containing:
+1. A Business Process object
+2. One or more Business Scenarios derived from that process
 
-Each test case object MUST have these fields:
+Your task is to generate structured, human-readable, business-focused test cases from the provided business scenarios strictly based on the provided.
+
+CRITICAL CONSTRAINTS:
+- Use only information explicitly provided in the Process and Scenario input.
+- Do NOT assume missing rules.
+- Do NOT introduce new business flows.
+- Do NOT reference UI elements, APIs, databases, or technical implementation.
+- Use clear business language only.
+- If a validation rule is not provided, do not invent one.
+- Each step must represent one clear business action.
+- Keep wording precise and professional.
+
+RETURN ONLY valid JSON.
+Output must be a single flat JSON array.
+Do NOT include markdown, commentary, or extra text.
+
+Each test case object MUST follow this exact schema:
+
 {
-  "scenarioIndex": <number>,          // index of the scenario in the input array (0-based)
-  "scenarioId": "<id-or-empty-string>",
+  "testCaseId": "<unique id>",
+  "scenarioIndex": <number>,
+  "scenarioId": "<string-or-empty>",
   "scenarioTitle": "<original scenario title>",
-  "title": "<short test case title>",
-  "type": "<Positive|Negative|Edge|Security|Performance|Usability|Other>",
-  "preconditions": ["..."],
-  "steps": ["Step 1", "Step 2", "..."],
-  "expected_result": "<expected result text>"
+  "businessProcess": "<BUSINESS_PROCESS value>",
+  "persona": "<business role>",
+  "title": "<short business-focused title>",
+  "description": "<brief explanation of what is being validated>",
+  "preRequisites": ["<business precondition>", "..."],
+  "testSteps": ["Step 1", "Step 2", "..."],
+  "expectedResult": "<clear business outcome including financial or state impact>",
+  "criticality": "Critical | High | Medium | Low",
+  "blocking": "Blocking | Non-Blocking",
+  "customerImpact": "<Yes/No with short explanation>",
+  "regulatorySensitivity": "<Yes/No with short explanation>"
 }
 
-REQUIREMENTS:
-- For each scenario, generate as many relevant and non-duplicate test cases as reasonably possible based on provided scenario details.
-- Do not cap the number artificially. Aim for exhaustive coverage while staying strictly relevant.
-- Make steps concrete and actionable (one action per step).
-- Keep strings short (<= 200 characters each) but complete.
-- Ensure the overall output is a valid JSON array (no trailing commas, no surrounding markdown).
-- Use scenarioIndex to map test cases to input scenarios.
+COVERAGE RULES:
+- Minimum 4 test cases per scenario.
+- Maximum 10 test cases per scenario.
+- Include varied scenario-relevant coverage without using labels such as
+  "happy path", "validation case", or "invalid input case" in test case titles.
+- Include at least one standard successful-flow case where applicable.
+- Include exception/negative coverage only when supported by provided business rules.
+- Include boundary coverage only when limits or thresholds are provided.
+- Generate Security or Performance cases only if explicitly implied in input.
+- Do not fabricate compliance checks unless Regulatory Impact is specified.
 
-CONTEXT:
-- Project ID: ${projectId}
-- Framework: ${framework}
-- Language: ${language}
+ALIGNMENT RULES:
+- All test cases must strictly align with the scenario's BUSINESS_PROCESS.
+- Do not introduce new business functionality.
+- Derive validations only from the scenario's stated rules.
+- Ensure expectedResult reflects business impact (balance change, approval trigger, status change, notification, compliance action, etc.).
 
-BUSINESS RULES:
-- Keep test cases aligned with each scenario's BUSINESS_PROCESS value.
-- Do not generate unrelated test cases.
+FORMATTING RULES:
+- Each string must be <= 200 characters.
+- Steps must be action-oriented and sequential.
+- No trailing commas.
+- No additional fields.
+- Output must be valid parsable JSON.
 
 INPUT SCENARIOS:
 ${scenarioText}
@@ -1290,6 +1316,15 @@ ${promptOverride ? `ADDITIONAL USER INSTRUCTIONS:\n${promptOverride}` : ""}
 
     let rawTC = "";
     let parsedTCs: any[] = [];
+    const normalizeCaseTitle = (title: any, scenarioTitle: any) => {
+      const raw = String(title || "").trim();
+      const cleaned = raw
+        .replace(/^(happy\s*path|validation|invalid\s*input|edge\s*case|security|performance)\s*[-:]\s*/i, "")
+        .trim();
+      if (cleaned) return cleaned;
+      const s = String(scenarioTitle || "Business test case").trim();
+      return `${s} case`;
+    };
 
     try {
       const tcResponse = await client.chat.completions.create({
@@ -1306,7 +1341,31 @@ ${promptOverride ? `ADDITIONAL USER INSTRUCTIONS:\n${promptOverride}` : ""}
       if (!parsed) parsed = tryParseJson(rawTC);
 
       if (Array.isArray(parsed) && parsed.length > 0) {
-        parsedTCs = parsed;
+        parsedTCs = parsed.map((tc: any) => ({
+          testCaseId: String(tc?.testCaseId || "").trim(),
+          scenarioIndex: Number(tc?.scenarioIndex ?? -1),
+          scenarioId: String(tc?.scenarioId || ""),
+          scenarioTitle: String(tc?.scenarioTitle || tc?.scenarioTitle || ""),
+          businessProcess: String(tc?.businessProcess || tc?.businessProcessName || ""),
+          persona: String(tc?.persona || ""),
+          title: normalizeCaseTitle(tc?.title, tc?.scenarioTitle),
+          description: String(tc?.description || ""),
+          preRequisites: Array.isArray(tc?.preRequisites)
+            ? tc.preRequisites.map(String)
+            : Array.isArray(tc?.preconditions)
+            ? tc.preconditions.map(String)
+            : [],
+          testSteps: Array.isArray(tc?.testSteps)
+            ? tc.testSteps.map(String)
+            : Array.isArray(tc?.steps)
+            ? tc.steps.map(String)
+            : [],
+          expectedResult: String(tc?.expectedResult || tc?.expected_result || ""),
+          criticality: String(tc?.criticality || "Medium"),
+          blocking: String(tc?.blocking || "Non-Blocking"),
+          customerImpact: String(tc?.customerImpact || ""),
+          regulatorySensitivity: String(tc?.regulatorySensitivity || ""),
+        }));
       } else {
         parsedTCs = [];
       }
@@ -1323,76 +1382,112 @@ ${promptOverride ? `ADDITIONAL USER INSTRUCTIONS:\n${promptOverride}` : ""}
         const s = scenarios[i];
         const baseSteps = s.steps || [];
 
-        // Happy path
         fallback.push({
+          testCaseId: "",
           scenarioIndex: i,
-          scenarioId: s._id || null,
+          scenarioId: s._id || "",
           scenarioTitle: s.title || `Scenario ${i + 1}`,
-          title: "Happy path - valid inputs",
-          type: "Positive",
-          preconditions: [],
-          steps: baseSteps.length > 0 ? baseSteps : ["Perform the main user flow described in the scenario"],
-          expected_result: s.expected_result || "Expected outcome occurs",
+          businessProcess: s.businessProcessName || "",
+          persona: s.persona || "",
+          title: `${s.title || `Scenario ${i + 1}`} - standard business flow`,
+          description: "Validate end-to-end flow with valid business inputs.",
+          preRequisites: [],
+          testSteps: baseSteps.length > 0 ? baseSteps : ["Perform the main user flow described in the scenario"],
+          expectedResult: s.expected_result || "Expected business outcome occurs.",
+          criticality: "High",
+          blocking: "Blocking",
+          customerImpact: "Yes - impacts customer transaction outcome.",
+          regulatorySensitivity: "No - not explicitly specified.",
         });
 
-        // Validation negative case
         fallback.push({
+          testCaseId: "",
           scenarioIndex: i,
-          scenarioId: s._id || null,
+          scenarioId: s._id || "",
           scenarioTitle: s.title || `Scenario ${i + 1}`,
-          title: "Validation - missing required field",
-          type: "Negative",
-          preconditions: [],
-          steps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Leave a required field empty", "Submit the form"]),
-          expected_result: "Validation error shown and submission prevented",
+          businessProcess: s.businessProcessName || "",
+          persona: s.persona || "",
+          title: `${s.title || `Scenario ${i + 1}`} - missing mandatory information`,
+          description: "Validate business rejection when required information is missing.",
+          preRequisites: [],
+          testSteps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Leave required business information empty", "Submit for processing"]),
+          expectedResult: "Business validation fails and processing is prevented.",
+          criticality: "High",
+          blocking: "Blocking",
+          customerImpact: "Yes - request cannot proceed.",
+          regulatorySensitivity: "No - not explicitly specified.",
         });
 
-        // Invalid input
         fallback.push({
+          testCaseId: "",
           scenarioIndex: i,
-          scenarioId: s._id || null,
+          scenarioId: s._id || "",
           scenarioTitle: s.title || `Scenario ${i + 1}`,
-          title: "Invalid input - malformed data",
-          type: "Negative",
-          preconditions: [],
-          steps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Enter malformed/invalid data", "Submit"]),
-          expected_result: "Appropriate error message shown and no success condition",
+          businessProcess: s.businessProcessName || "",
+          persona: s.persona || "",
+          title: `${s.title || `Scenario ${i + 1}`} - malformed business input`,
+          description: "Validate rejection of malformed business input values.",
+          preRequisites: [],
+          testSteps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Provide malformed business data", "Submit for processing"]),
+          expectedResult: "Request is rejected and no business state change occurs.",
+          criticality: "Medium",
+          blocking: "Non-Blocking",
+          customerImpact: "Yes - request is rejected.",
+          regulatorySensitivity: "No - not explicitly specified.",
         });
 
-        // Edge / boundary
         fallback.push({
+          testCaseId: "",
           scenarioIndex: i,
-          scenarioId: s._id || null,
+          scenarioId: s._id || "",
           scenarioTitle: s.title || `Scenario ${i + 1}`,
-          title: "Edge case - boundary values",
-          type: "Edge",
-          preconditions: [],
-          steps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Enter maximum length values or boundary numbers", "Submit"]),
-          expected_result: "System handles boundary values without error",
+          businessProcess: s.businessProcessName || "",
+          persona: s.persona || "",
+          title: `${s.title || `Scenario ${i + 1}`} - boundary business limits`,
+          description: "Validate correct handling of boundary business limits.",
+          preRequisites: [],
+          testSteps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Use boundary business values", "Submit for processing"]),
+          expectedResult: "Boundary values are handled as per business rules.",
+          criticality: "Medium",
+          blocking: "Non-Blocking",
+          customerImpact: "Yes - may affect transaction acceptance.",
+          regulatorySensitivity: "No - not explicitly specified.",
         });
 
-        // Security basic
         fallback.push({
+          testCaseId: "",
           scenarioIndex: i,
-          scenarioId: s._id || null,
+          scenarioId: s._id || "",
           scenarioTitle: s.title || `Scenario ${i + 1}`,
-          title: "Security - unauthorized access",
-          type: "Security",
-          preconditions: ["User not authenticated"],
-          steps: ["Attempt to perform the scenario action while not logged in"],
-          expected_result: "Access is denied and user is redirected to login",
+          businessProcess: s.businessProcessName || "",
+          persona: s.persona || "",
+          title: `${s.title || `Scenario ${i + 1}`} - unauthorized attempt`,
+          description: "Validate business controls for unauthorized attempt.",
+          preRequisites: ["Actor is not authorized for this process."],
+          testSteps: ["Attempt to perform the business action without required authorization."],
+          expectedResult: "Action is denied and no business state changes.",
+          criticality: "High",
+          blocking: "Blocking",
+          customerImpact: "No - unauthorized request is blocked.",
+          regulatorySensitivity: "Yes - control enforcement may be required.",
         });
 
-        // Performance placeholder
         fallback.push({
+          testCaseId: "",
           scenarioIndex: i,
-          scenarioId: s._id || null,
+          scenarioId: s._id || "",
           scenarioTitle: s.title || `Scenario ${i + 1}`,
-          title: "Performance - repeated actions",
-          type: "Performance",
-          preconditions: [],
-          steps: ["Perform the main action repeatedly (e.g., 50 times)"],
-          expected_result: "System response time stays within acceptable thresholds and no failures",
+          businessProcess: s.businessProcessName || "",
+          persona: s.persona || "",
+          title: `${s.title || `Scenario ${i + 1}`} - repeated execution stability`,
+          description: "Validate business continuity under repeated valid requests.",
+          preRequisites: [],
+          testSteps: ["Perform the core business action repeatedly within a short interval."],
+          expectedResult: "Business outcomes remain consistent without processing failure.",
+          criticality: "Medium",
+          blocking: "Non-Blocking",
+          customerImpact: "Yes - poor performance can affect customer outcomes.",
+          regulatorySensitivity: "No - not explicitly specified.",
         });
       }
 
@@ -1415,26 +1510,22 @@ ${promptOverride ? `ADDITIONAL USER INSTRUCTIONS:\n${promptOverride}` : ""}
 
           const synthTemplates = [
             {
-              title: "Happy path - valid inputs",
-              type: "Positive",
+              title: `${s.title || `Scenario ${i + 1}`} - standard business flow`,
               steps: baseSteps.length > 0 ? baseSteps : ["Perform the main user flow described in the scenario"],
               expected_result: s.expected_result || "Expected outcome occurs",
             },
             {
-              title: "Validation - missing required field",
-              type: "Negative",
+              title: `${s.title || `Scenario ${i + 1}`} - missing mandatory information`,
               steps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Leave a required field empty", "Submit the form"]),
               expected_result: "Validation error shown and submission prevented",
             },
             {
-              title: "Invalid input - malformed data",
-              type: "Negative",
+              title: `${s.title || `Scenario ${i + 1}`} - malformed business input`,
               steps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Enter malformed/invalid data", "Submit"]),
               expected_result: "Appropriate error message shown and no success condition",
             },
             {
-              title: "Edge case - boundary values",
-              type: "Edge",
+              title: `${s.title || `Scenario ${i + 1}`} - boundary business limits`,
               steps: (baseSteps.length > 0 ? baseSteps.slice(0, Math.max(1, baseSteps.length - 1)) : ["Start the flow"]).concat(["Enter maximum length values or boundary numbers", "Submit"]),
               expected_result: "System handles boundary values without error",
             },
@@ -1443,14 +1534,21 @@ ${promptOverride ? `ADDITIONAL USER INSTRUCTIONS:\n${promptOverride}` : ""}
           for (let k = 0; k < needed; k++) {
             const t = synthTemplates[k % synthTemplates.length];
             additional.push({
+              testCaseId: "",
               scenarioIndex: i,
-              scenarioId: s._id || null,
+              scenarioId: s._id || "",
               scenarioTitle: s.title || `Scenario ${i + 1}`,
-              title: t.title,
-              type: t.type,
-              preconditions: [],
-              steps: t.steps,
-              expected_result: t.expected_result,
+              businessProcess: s.businessProcessName || "",
+              persona: s.persona || "",
+              title: normalizeCaseTitle(t.title, s.title),
+              description: "Additional coverage case generated for minimum scenario completeness.",
+              preRequisites: [],
+              testSteps: t.steps,
+              expectedResult: t.expected_result,
+              criticality: "Medium",
+              blocking: "Non-Blocking",
+              customerImpact: "Yes - impacts business flow result.",
+              regulatorySensitivity: "No - not explicitly specified.",
             });
           }
         }
@@ -1483,11 +1581,19 @@ try {
       return tc.scenarioTitle || parentScenario?.title || "";
     })(),
     title: tc.title,
+    testCaseId: tc.testCaseId || "",
     description: tc.description || "",
-    steps: Array.isArray(tc.steps) ? tc.steps : [],
-    expected_result: tc.expected_result || "",
+    persona: tc.persona || "",
+    preRequisites: Array.isArray(tc.preRequisites) ? tc.preRequisites.join("; ") : "",
+    steps: Array.isArray(tc.testSteps) ? tc.testSteps : (Array.isArray(tc.steps) ? tc.steps : []),
+    expected_result: tc.expectedResult || tc.expected_result || "",
+    criticality: tc.criticality || "",
+    blockingType: tc.blocking || "",
+    customerImpact: tc.customerImpact || "",
+    regulatorySensitivity: tc.regulatorySensitivity || "",
     edited: false,
     testRunSuccess: false,
+    codeGenerated: false,
     source: "ai",
   })));
 } catch (err: any) {

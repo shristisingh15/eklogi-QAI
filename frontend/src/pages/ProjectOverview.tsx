@@ -28,6 +28,7 @@ type ProjectMetrics = {
 export default function ProjectOverview(): JSX.Element {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [pagesOpen, setPagesOpen] = useState<boolean>(false);
   const [project, setProject] = useState<ProjectData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,13 +107,34 @@ export default function ProjectOverview(): JSX.Element {
       </div>
 
       <div className="project-overview-upload-row">
-        <button
-          type="button"
-          className="project-overview-upload-btn"
-          onClick={() => id && navigate(`/project/${id}/upload`)}
-        >
-          Upload Document
-        </button>
+        <div className="project-overview-pages-dropdown">
+          <button
+            type="button"
+            className="project-overview-pages-btn"
+            onClick={() => setPagesOpen((prev) => !prev)}
+          >
+            Pages +
+          </button>
+          {pagesOpen && (
+            <div className="project-overview-pages-menu">
+              <button type="button" onClick={() => id && navigate(`/project/${id}/upload`)}>
+                Upload Document
+              </button>
+              <button type="button" onClick={() => id && navigate(`/project/${id}/analysis`)}>
+                Business Process
+              </button>
+              <button type="button" onClick={() => id && navigate(`/project/${id}/scenarios`)}>
+                Test Scenario
+              </button>
+              <button type="button" onClick={() => id && navigate(`/project/${id}/testcases`)}>
+                Test Case
+              </button>
+              <button type="button" onClick={() => id && navigate(`/project/${id}/test`)}>
+                Test Codes
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="project-overview-metrics-card">
@@ -140,7 +162,7 @@ export default function ProjectOverview(): JSX.Element {
       </div>
 
       <div className="project-overview-files-card">
-        <h3>Uploaded Documents</h3>
+        <h3>Document Repository</h3>
         {loading ? (
           <p>Loading documents...</p>
         ) : files.length === 0 ? (

@@ -80,7 +80,16 @@ export default function UploadDocument({ setStep, projectId }: UploadDocumentPro
         setStep(2);
       } else {
         // if used standalone, redirect to analysis page
-        navigate(`/project/${id}/analysis`);
+        navigate(`/project/${id}/analysis`, {
+          state: {
+            generationStatus: {
+              title: "Business Processes Generated",
+              count: Number(json?.count || 0),
+              label: "Business Processes",
+              subtitle: `File: ${file.name}`,
+            },
+          },
+        });
       }
     } catch (err: any) {
       console.error("❌ generate-bp failed:", err);
@@ -105,86 +114,89 @@ export default function UploadDocument({ setStep, projectId }: UploadDocumentPro
     }
   };
   return (
-    <div className="project-page">
-      {/* push content down so stepper doesn't overlap */}
-      <div style={{ marginTop: 80 }} />
-      <div style={{ margin: "0 auto 14px", display: "flex", justifyContent: "center" }}>
-        <StepButtons />
-      </div>
-
-
-
-      {/* ===== Upload card (centered, matches .upload-container style) ===== */}
-      <div style={{ width: "min(1200px, 95%)", margin: "0 auto 0" }}>
-        <div className="upload-container" style={{ textAlign: "center" }}>
-          <h2 style={{ margin: "0 0 8px 0" }}>Upload Documents</h2>
-          <p style={{ marginTop: 0, color: "#6b7280" }}>
-            Upload your functional requirements, specifications, or user stories
-            <br />
-            Drop your files here
-            <br />
-            Supports PDF, DOC, DOCX, TXT files up to 10MB
-          </p>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            accept=".pdf,.doc,.docx,.txt"
-            onChange={handleFileChange}
-          />
-
+    <div className="project-page upload-document-page">
+      <div className="upload-page-content">
+        <div className="upload-page-back-row">
           <button
-            className="upload-btn"
-            disabled={uploading}
-            onClick={() => fileInputRef.current?.click()}
-            style={{ marginTop: 12 }}
+            type="button"
+            className="upload-back-link"
+            onClick={() => id && navigate(`/project/${id}`)}
           >
-            {uploading ? "Processing…" : "Choose File"}
+            ← Back to Overview
           </button>
         </div>
-      </div>
 
-      {/* Error */}
-      {error && <p style={{ color: "crimson", maxWidth: 900, margin: "12px auto 0" }}>{error}</p>}
+        <div className="upload-page-stepper">
+          <StepButtons />
+        </div>
 
-      {/* Uploaded files table */}
-      <div className="history-section" style={{ width: "min(1200px, 95%)", margin: "20px auto 80px" }}>
-        <h3>Uploaded Files (This Project)</h3>
-        {loading ? (
-          <p>Loading…</p>
-        ) : files.length === 0 ? (
-          <p>No documents uploaded yet.</p>
-        ) : (
-          <table className="upload-table">
-            <thead>
-              <tr>
-                <th style={{ textAlign: "left" }}>File Name</th>
-                <th>Uploaded At</th>
-                <th>Size</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {files.map((f) => (
-                <tr key={f._id}>
-                  <td style={{ textAlign: "left" }}>{f.filename}</td>
-                  <td>{f.uploadedAt ? new Date(f.uploadedAt).toLocaleString() : "-"}</td>
-                  <td>{typeof f.size === "number" ? `${Math.ceil(f.size / 1024)} KB` : "-"}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className="upload-file-btn upload-file-btn-delete"
-                      onClick={() => deleteFile(f._id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+        <section className="upload-container">
+          <div className="upload-card-grid">
+            <h2>Upload Documents</h2>
+            <div className="upload-copy">
+              <p>Upload your functional requirements, specifications, or user stories</p>
+              <p>Drop your files here</p>
+              <p>Supports PDF, DOC, DOCX, TXT files up to 10MB</p>
+            </div>
+
+            <div className="upload-btn-wrap">
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                accept=".pdf,.doc,.docx,.txt"
+                onChange={handleFileChange}
+              />
+              <button
+                className="upload-btn"
+                disabled={uploading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {uploading ? "Processing…" : "Choose File"}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {error && <p className="upload-error">{error}</p>}
+
+        <section className="history-section">
+          <h3>Uploaded Files (This Project)</h3>
+          {loading ? (
+            <p className="upload-table-message">Loading…</p>
+          ) : files.length === 0 ? (
+            <p className="upload-table-message">No documents uploaded yet.</p>
+          ) : (
+            <table className="upload-table">
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>Uploaded At</th>
+                  <th>Size</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody>
+                {files.map((f) => (
+                  <tr key={f._id}>
+                    <td>{f.filename}</td>
+                    <td>{f.uploadedAt ? new Date(f.uploadedAt).toLocaleString() : "-"}</td>
+                    <td>{typeof f.size === "number" ? `${Math.ceil(f.size / 1024)} KB` : "-"}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="upload-file-btn upload-file-btn-delete"
+                        onClick={() => deleteFile(f._id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
       </div>
     </div>
   );

@@ -1,11 +1,10 @@
 // frontend/src/pages/TestScenarios.tsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import StepButtons from "./StepButton";
-import SourceFileInfo from "./SourceFileInfo";
 import { useProject, Scenario } from "./ProjectContext"; // ✅ use context
 import "./testscenario.css";
-import { FaSpinner } from "react-icons/fa";
+import GenerationStatusPopup, { GenerationStatusData } from "./GenerationStatusPopup";
 
 
 const API_BASE =
@@ -21,6 +20,7 @@ type ProjectDetails = {
 export default function TestScenariosPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     setScenarios: setCtxScenarios,
@@ -45,6 +45,7 @@ const [generating, setGenerating] = useState<boolean>(false);
   const [scenarioDetailsDraft, setScenarioDetailsDraft] = useState<Record<string, string>>({});
   const [savingScenarioDetails, setSavingScenarioDetails] = useState<boolean>(false);
   const [bpSortRank, setBpSortRank] = useState<Record<string, number>>({});
+  const [generationStatus, setGenerationStatus] = useState<GenerationStatusData | null>(null);
 
   const priorityRank: Record<string, number> = {
     critical: 0,
@@ -233,13 +234,37 @@ const [generating, setGenerating] = useState<boolean>(false);
       setCtxScenarios(chosen);
       selectScenario(chosen[0]);
 
-      navigate(`/project/${id}/testcases`);
+      const generatedCount = Array.isArray(data?.testCases)
+        ? data.testCases.length
+        : Number(data?.count || 0);
+      navigate(`/project/${id}/testcases`, {
+        state: {
+          generationStatus: {
+            title: "Test Cases Generated",
+            count: generatedCount,
+            label: "Test Cases",
+            subtitle: `${chosen.length} approved scenario(s)`,
+          },
+        },
+      });
     } catch (err: any) {
       console.error("handleNext error:", err);
       alert("Unexpected error generating test cases.");
        setGenerating(false);
     }
   };
+
+  useEffect(() => {
+    const incoming = (location.state as any)?.generationStatus as GenerationStatusData | undefined;
+    if (!incoming) return;
+    setGenerationStatus(incoming);
+    const cleanState = { ...(location.state as any) };
+    delete cleanState.generationStatus;
+    navigate(
+      { pathname: location.pathname, search: location.search, hash: location.hash },
+      { replace: true, state: cleanState }
+    );
+  }, [location, navigate]);
 
   const handleEditScenarioCard = async (scenario: any) => {
     if (!scenario?._id) return;
@@ -432,7 +457,7 @@ const groupedByBP = useMemo(() => {
 
       <div className="page-content-wrap">
       {/* Header */}
-      <div className="project-header">
+      <div className="project-header stage-project-header">
         <h2>
           {projectDetails?.name ||
             (loadingProject ? "Loading…" : "Test Scenarios")}
@@ -445,14 +470,16 @@ const groupedByBP = useMemo(() => {
       </div>
 
       {/* Stepper */}
-      <StepButtons />
+      <div className="stage-stepper-wrap">
+        <StepButtons />
+      </div>
 
-      <div className="scenario-toolbar">
-        <SourceFileInfo projectId={id} className="source-file-inline" style={{ margin: 0 }} />
-        <div className="controls-right">
+      <div className="stage-action-row">
+        <div className="stage-action-left" />
+        <div className="stage-action-right">
           <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} />
-            <span>Select all</span>
+            <span>Approve all</span>
           </label>
 
           <div className="selected-counter">
@@ -461,38 +488,33 @@ const groupedByBP = useMemo(() => {
               : "0 selected"}
           </div>
 
-          <div style={{ marginLeft: 12 }}>
-  
-  <button
-  className={`btn btn-primary ${generating ? "btn-generating" : ""}`}
-  disabled={!anySelected || generating}
-  onClick={() => {
-    if (!anySelected) {
-      alert("Please select at least one test scenario.");
-      return;
-    }
-    handleNext();
-  }}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    justifyContent: "center",
-    fontWeight: "600",
-  }}
->
-  {generating ? (
-    <>
-      <FaSpinner className="spin-icon" />
-      Generating…
-    </>
-  ) : (
-    "Next →"
-  )}
-</button>
-
-
-</div>
+          <button
+            className={`btn btn-primary stage-approve-btn ${generating ? "approve-btn-loading" : ""}`}
+            disabled={!anySelected || generating}
+            onClick={() => {
+              if (!anySelected) {
+                alert("Please select at least one test scenario.");
+                return;
+              }
+              handleNext();
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              justifyContent: "center",
+              fontWeight: "600",
+            }}
+          >
+            {generating ? (
+              <>
+                <span className="approve-btn-spinner" aria-hidden="true" />
+                Generating…
+              </>
+            ) : (
+              "Approve →"
+            )}
+          </button>
 
         </div>
       </div>
@@ -519,34 +541,18 @@ const groupedByBP = useMemo(() => {
 
       {expandedBp[bpName] && (
         <div className="tiles-grid" style={{ marginTop: 12 }}>
-          {bpScenarios.map((s, idx) => (
+          {bpScenarios.map((s) => (
             <article
               key={s._id}
               className="tile-card tile-card-clickable"
               onClick={() => setActiveDetailsScenario(s)}
             >
               <div className="tile-header">
-                <label className="tile-select">
-                  <input
-                    type="checkbox"
-                    checked={!!selected[s._id!]}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={() => toggleSelect(s._id!)}
-                  />
-                </label>
-                <h3 className="tile-title">{idx + 1}. {s.title}</h3>
+                <h3 className="tile-title">
+                  {String((s as any).scenarioId || "").trim() || "Scenario"}: {s.title}
+                </h3>
                 {s.edited ? <span className="scenario-edited-dot" title="Edited">●</span> : null}
                 {s.testRunSuccess ? <span className="scenario-success-dot" title="Test code generated successfully">●</span> : null}
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditScenarioCard(s);
-                  }}
-                >
-                  Edit
-                </button>
               </div>
               {s.description && <p className="tile-desc">{s.description}</p>}
               {s.steps && (
@@ -562,6 +568,27 @@ const groupedByBP = useMemo(() => {
                   <strong>Expected:</strong> {s.expected_result}
                 </div>
               )}
+              <div className="bp-actions">
+                <label className="checkbox-label" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    checked={!!selected[s._id!]}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={() => toggleSelect(s._id!)}
+                  />
+                  <span>Approve</span>
+                </label>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditScenarioCard(s);
+                  }}
+                >
+                  Edit
+                </button>
+              </div>
             </article>
           ))}
         </div>
@@ -648,6 +675,7 @@ const groupedByBP = useMemo(() => {
 
       <div style={{ height: 40 }} />
       </div>
+      <GenerationStatusPopup data={generationStatus} onClose={() => setGenerationStatus(null)} />
     </div>
   );
 }
