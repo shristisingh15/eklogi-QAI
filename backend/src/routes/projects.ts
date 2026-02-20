@@ -12,6 +12,13 @@ import { TestCase } from "../models/TestCase"; // adjust the path if needed
 
 export const projectsRouter = Router();
 
+function buildProjectIdFilter(projectId: string): any {
+  const objId = mongoose.Types.ObjectId.isValid(projectId)
+    ? new mongoose.Types.ObjectId(projectId)
+    : null;
+  return objId ? { $in: [projectId, objId] } : projectId;
+}
+
 // OpenAI client
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -438,7 +445,7 @@ projectsRouter.post("/:id/upload", upload.single("file"), async (req, res) => {
  */
 projectsRouter.get("/:id/files", async (req, res, next) => {
   try {
-    const files = await ProjectFile.find({ projectId: req.params.id })
+    const files = await ProjectFile.find({ projectId: buildProjectIdFilter(req.params.id) })
       .sort({ uploadedAt: 1 })
       .lean();
 
@@ -465,13 +472,10 @@ projectsRouter.get("/:id/files", async (req, res, next) => {
 projectsRouter.get("/:id/overview", async (req, res, next) => {
   try {
     const projectId = req.params.id;
+    const projectIdFilter: any = buildProjectIdFilter(projectId);
     const objId = mongoose.Types.ObjectId.isValid(projectId)
       ? new mongoose.Types.ObjectId(projectId)
       : null;
-
-    const projectIdFilter: any = objId
-      ? { $in: [projectId, objId] }
-      : projectId;
 
     const bpFilter = objId
       ? { projectId: { $in: [projectId, objId] } }
@@ -519,7 +523,7 @@ projectsRouter.get("/:id/files/:fileId", async (req, res, next) => {
   try {
     const file = await ProjectFile.findOne({
       _id: req.params.fileId,
-      projectId: req.params.id,
+      projectId: buildProjectIdFilter(req.params.id),
     });
 
     if (!file) return res.status(404).json({ message: "file not found" });
@@ -544,7 +548,7 @@ projectsRouter.put("/:id/files/:fileId", async (req, res, next) => {
     if (!filename) return res.status(400).json({ message: "filename is required" });
 
     const updated = await ProjectFile.findOneAndUpdate(
-      { _id: req.params.fileId, projectId: req.params.id },
+      { _id: req.params.fileId, projectId: buildProjectIdFilter(req.params.id) },
       { $set: { filename } },
       { new: true }
     ).lean();
@@ -572,7 +576,7 @@ projectsRouter.delete("/:id/files/:fileId", async (req, res, next) => {
   try {
     const deleted = await ProjectFile.findOneAndDelete({
       _id: req.params.fileId,
-      projectId: req.params.id,
+      projectId: buildProjectIdFilter(req.params.id),
     }).lean();
 
     if (!deleted) return res.status(404).json({ message: "file not found" });

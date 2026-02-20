@@ -29,28 +29,70 @@ export default function UploadDocument({ setStep, projectId }: UploadDocumentPro
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const loadFiles = async (projectId: string) => {
+    const [filesResult, overviewResult] = await Promise.allSettled([
+      fetch(`${API_BASE}/api/projects/${projectId}/files`, { cache: "no-store" }),
+      fetch(`${API_BASE}/api/projects/${projectId}/overview`, { cache: "no-store" }),
+    ]);
+
+    const filesRes = filesResult.status === "fulfilled" ? filesResult.value : null;
+    const overviewRes = overviewResult.status === "fulfilled" ? overviewResult.value : null;
+
+    const directFiles = filesRes?.ok ? await filesRes.json() : [];
+    const overviewJson = overviewRes?.ok ? await overviewRes.json() : {};
+    const overviewFiles = Array.isArray(overviewJson?.files) ? overviewJson.files : [];
+
+    const raw = [
+      ...(Array.isArray(directFiles) ? directFiles : []),
+      ...overviewFiles,
+    ];
+    const unique = new Map<string, any>();
+    raw.forEach((f: any) => {
+      const key = String(f?._id || `${f?.filename || ""}-${f?.uploadedAt || ""}`);
+      if (!key) return;
+      unique.set(key, f);
+    });
+
+    if (!filesRes && !overviewRes) {
+      throw new Error("Failed to load files");
+    }
+
+    return Array.from(unique.values()).sort((a: ProjectFile, b: ProjectFile) => {
+      const at = new Date(a?.uploadedAt || 0).getTime();
+      const bt = new Date(b?.uploadedAt || 0).getTime();
+      return bt - at;
+    });
+  };
+
   // fetch uploaded file history
   useEffect(() => {
     if (!id) return;
+    let cancelled = false;
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE}/api/projects/${id}/files`);
-        if (!res.ok) throw new Error(`Failed to load files: ${res.status}`);
-        const data = await res.json();
-        const sorted = [...(Array.isArray(data) ? data : [])].sort((a: ProjectFile, b: ProjectFile) => {
-          const at = new Date(a?.uploadedAt || 0).getTime();
-          const bt = new Date(b?.uploadedAt || 0).getTime();
-          return bt - at;
-        });
-        setFiles(sorted);
+        setError(null);
+        const sorted = await loadFiles(id);
+        if (!cancelled) setFiles(sorted);
       } catch (err: any) {
         console.error("❌ Load files failed:", err);
-        setError(err?.message || "Failed to load history");
+        if (!cancelled) setError(err?.message || "Failed to load history");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
+    const interval = window.setInterval(async () => {
+      try {
+        const sorted = await loadFiles(id);
+        if (!cancelled) setFiles(sorted);
+      } catch {
+        // keep previous data on background refresh failure
+      }
+    }, 15000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
   }, [id]);
 
   // handle Choose File -> call OpenAI + store results in Mongo

@@ -16,6 +16,12 @@ type GeneratedCode = {
   error?: string | null;
 };
 
+type ProjectDetails = {
+  _id?: string;
+  name?: string;
+  description?: string;
+};
+
 const API_BASE =
   import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 
@@ -37,6 +43,7 @@ const state = location.state || {};
   const [expandedCase, setExpandedCase] = useState<Record<string, boolean>>({});
   const [bpSortRank, setBpSortRank] = useState<Record<string, number>>({});
   const [generationStatus, setGenerationStatus] = useState<GenerationStatusData | null>(null);
+  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
 
   const priorityRank: Record<string, number> = {
     critical: 0,
@@ -75,6 +82,24 @@ const hasCodes = codes.length > 0 && codes.some(c => c.code);
     projectCtx?.projectId ||
     (ctxConfig && (ctxConfig.projectId || ctxConfig._id)) ||
     null;
+
+  useEffect(() => {
+    if (!projectId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/projects/${projectId}`, { cache: "no-store" });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!cancelled) setProjectDetails(json || null);
+      } catch {
+        if (!cancelled) setProjectDetails(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
 
   // COPY / DOWNLOAD helpers
   async function copyToClipboard(text: string) {
@@ -278,10 +303,13 @@ const hasCodes = codes.length > 0 && codes.some(c => c.code);
       <div className="page-content-wrap">
         <div className="project-header stage-project-header">
           <h2>
-            {projectCtx?.currentProjectName || (ctxConfig && ctxConfig.projectName) || "Project"}
+            {projectDetails?.name ||
+              projectCtx?.currentProjectName ||
+              (ctxConfig && ctxConfig.projectName) ||
+              "Project"}
           </h2>
           <p className="muted">
-            {ctxConfig?.description || "Run generated tests"}
+            {projectDetails?.description || ctxConfig?.description || "Run generated tests"}
           </p>
 
           <div className="stage-stepper-wrap">

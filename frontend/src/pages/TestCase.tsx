@@ -31,6 +31,12 @@ type GeneratedCode = {
   error?: string | null;
 };
 
+type ProjectDetails = {
+  _id?: string;
+  name?: string;
+  description?: string;
+};
+
 const API_BASE = import.meta.env.VITE_API_BASE || "https://eklogi-qai.onrender.com";
 const FRAMEWORK_OPTIONS = ["JUnit", "Selenium", "Mocha", "Jest", "PyTest"];
 const LANGUAGE_OPTIONS = ["Java", "TypeScript", "JavaScript", "Python", "C#"];
@@ -93,6 +99,7 @@ export default function TestCasesPage(): JSX.Element {
   const [savingTestCaseDetails, setSavingTestCaseDetails] = useState<boolean>(false);
   const [bpSortRank, setBpSortRank] = useState<Record<string, number>>({});
   const [generationStatus, setGenerationStatus] = useState<GenerationStatusData | null>(null);
+  const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
 
   useEffect(() => {
     setTestCases(sourceTestCases);
@@ -124,6 +131,33 @@ export default function TestCasesPage(): JSX.Element {
     (ctxConfig && (ctxConfig.projectId || ctxConfig._id)) ||
     (state && state.projectId) ||
     null;
+
+  useEffect(() => {
+    if (!projectId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/projects/${projectId}`, { cache: "no-store" });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!cancelled) setProjectDetails(json || null);
+      } catch {
+        if (!cancelled) setProjectDetails(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
+
+  const resolvedProjectDisplayName =
+    projectDetails?.name ||
+    projectDisplayName ||
+    "Project";
+  const resolvedProjectSubtitle =
+    projectDetails?.description ||
+    projectSubtitle ||
+    "Generated test cases";
 
   const lastPushedRef = React.useRef<{ framework?: string; language?: string }>({
     framework: initialFramework,
@@ -198,6 +232,19 @@ export default function TestCasesPage(): JSX.Element {
   function stripFencedCode(s: string | undefined | null) {
     if (!s) return "";
     return s.replace(/^\s*```[a-zA-Z0-9-]*\n?/, "").replace(/\n?```\s*$/, "");
+  }
+
+  function getActionDetails(tc: TestCase): string {
+    if (Array.isArray(tc.steps) && tc.steps.length > 0) {
+      return tc.steps
+        .map((step, i) => `${i + 1}. ${String(step || "").trim()}`)
+        .filter(Boolean)
+        .join("\n");
+    }
+    if (typeof tc.description === "string" && tc.description.trim()) {
+      return tc.description.trim();
+    }
+    return "Action not provided";
   }
 
   const groupedHierarchy = useMemo(() => {
@@ -530,9 +577,9 @@ export default function TestCasesPage(): JSX.Element {
 
       <div className="page-content-wrap">
         <div className="project-header stage-project-header">
-          <h2>{projectDisplayName || "Project"}</h2>
+          <h2>{resolvedProjectDisplayName}</h2>
           <p className="muted">
-            {projectSubtitle || "Generated test cases"}
+            {resolvedProjectSubtitle}
           </p>
           <div className="stage-stepper-wrap">
             <StepButtons />
@@ -682,7 +729,7 @@ export default function TestCasesPage(): JSX.Element {
                                           {tc.edited && !tc.testRunSuccess ? <span className="scenario-edited-dot" title="Edited">●</span> : null}
                                           {tc.testRunSuccess ? <span className="scenario-success-dot" title="Test code generated successfully">●</span> : null}
                                         </td>
-                                        <td>{tc.steps?.[0] || tc.description || "Action not provided"}</td>
+                                        <td style={{ whiteSpace: "pre-wrap" }}>{getActionDetails(tc)}</td>
                                         <td>{tc.expected_result || "Expected result not provided"}</td>
                                         <td>
                                           <button

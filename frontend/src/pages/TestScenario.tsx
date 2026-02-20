@@ -57,10 +57,22 @@ const [generating, setGenerating] = useState<boolean>(false);
   const naturalCompare = (a: string, b: string) =>
     a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
 
+  const scenarioOrderValue = (value: any): number => {
+    const raw = String(value || "").trim();
+    if (!raw) return Number.MAX_SAFE_INTEGER;
+    const digits = raw.match(/\d+/g);
+    if (!digits || digits.length === 0) return Number.MAX_SAFE_INTEGER;
+    const last = Number(digits[digits.length - 1]);
+    return Number.isFinite(last) ? last : Number.MAX_SAFE_INTEGER;
+  };
+
   const sortScenariosAsc = (list: any[]) =>
     [...list].sort((a: any, b: any) => {
       const aId = String(a?.scenarioId || "").trim();
       const bId = String(b?.scenarioId || "").trim();
+      const aOrder = scenarioOrderValue(aId);
+      const bOrder = scenarioOrderValue(bId);
+      if (aOrder !== bOrder) return aOrder - bOrder;
       if (aId && bId && aId !== bId) return naturalCompare(aId, bId);
       const aTitle = String(a?.title || "").trim();
       const bTitle = String(b?.title || "").trim();
@@ -118,11 +130,11 @@ const [generating, setGenerating] = useState<boolean>(false);
         }
         const json = await res.json();
         const list: Scenario[] = Array.isArray(json) ? json : json?.items ?? [];
-        setScenarios(list);
+        setScenarios(sortScenariosAsc(list));
 
         // init selected map
         const map: Record<string, boolean> = {};
-        list.forEach((s) => (map[s._id!] = false));
+        sortScenariosAsc(list).forEach((s) => (map[s._id!] = false));
         setSelected(map);
       } catch (e: any) {
         if (e?.name !== "AbortError")

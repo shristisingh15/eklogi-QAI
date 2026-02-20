@@ -43,21 +43,37 @@ export default function ProjectOverview(): JSX.Element {
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
-    (async () => {
+    const loadOverview = async () => {
       try {
         setLoading(true);
         setError(null);
-        const [projectRes, overviewRes] = await Promise.all([
+        const [projectResult, overviewResult, filesResult] = await Promise.allSettled([
           fetch(`${API_BASE}/api/projects/${id}`),
           fetch(`${API_BASE}/api/projects/${id}/overview`),
+          fetch(`${API_BASE}/api/projects/${id}/files`),
         ]);
-        if (!projectRes.ok) throw new Error(`HTTP ${projectRes.status}`);
-        const projectJson = await projectRes.json();
+        const projectRes = projectResult.status === "fulfilled" ? projectResult.value : null;
+        const overviewRes = overviewResult.status === "fulfilled" ? overviewResult.value : null;
+        const filesRes = filesResult.status === "fulfilled" ? filesResult.value : null;
+
+        const projectJson = projectRes?.ok ? await projectRes.json() : null;
         if (!cancelled) setProject(projectJson || null);
 
-        const overviewJson = overviewRes.ok ? await overviewRes.json() : {};
+        const overviewJson = overviewRes?.ok ? await overviewRes.json() : {};
         const metricJson = overviewJson?.metrics || {};
-        const fileItems = Array.isArray(overviewJson?.files) ? overviewJson.files : [];
+        const overviewFiles = Array.isArray(overviewJson?.files) ? overviewJson.files : [];
+        const directFiles = filesRes?.ok ? await filesRes.json() : [];
+        const filesRaw = [
+          ...overviewFiles,
+          ...(Array.isArray(directFiles) ? directFiles : []),
+        ];
+        const uniqueMap = new Map<string, any>();
+        filesRaw.forEach((f: any) => {
+          const key = String(f?._id || `${f?.filename || ""}-${f?.uploadedAt || ""}`);
+          if (!key) return;
+          uniqueMap.set(key, f);
+        });
+        const fileItems = Array.from(uniqueMap.values());
 
         if (!cancelled) {
           setMetrics({
@@ -74,14 +90,21 @@ export default function ProjectOverview(): JSX.Element {
             })
           );
         }
+
+        if (!projectRes && !overviewRes && !filesRes) {
+          throw new Error("Failed to reach backend");
+        }
       } catch (e: any) {
         if (!cancelled) setError(e?.message || "Failed to load project");
       } finally {
         if (!cancelled) setLoading(false);
       }
-    })();
+    };
+    loadOverview();
+    const interval = window.setInterval(loadOverview, 15000);
     return () => {
       cancelled = true;
+      window.clearInterval(interval);
     };
   }, [id]);
 
